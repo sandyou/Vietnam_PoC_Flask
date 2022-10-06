@@ -11,10 +11,11 @@ app = Flask(__name__)
 @app.route("/", methods=['POST'])
 def getimvs():
     content = request.get_json(force=True)
+    logging.info("iMVS data is:"+content)
     #print("get imvs contents:", content)
-    #print("Do request to HIS")
-    res = tokenrequests.Dorequest(content)
-    # print(res.text)
+    print("Access iMVSdata, Do request to HIS")
+    res = tokenrequests.Dorequest(content,logging)
+    print("request from HIS:"+res.text)
     return res.text
 
 
@@ -29,4 +30,4 @@ def all_routes(text):
 if __name__ == "__main__":
     app.config['JSON_AS_ASCII'] = False
     logging.basicConfig(filename='error.log', level=logging.DEBUG)
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8070)

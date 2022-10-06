@@ -1,15 +1,21 @@
 import json
 import requests
+import logging
+
+logging.basicConfig(level=logging.DEBUG, filename='log.txt',
+                    format='[%(asctime)s %(levelname)-8s] %(message)s',
+                    datefmt='%Y%m%d %H:%M:%S')
 
 link = 'Noibo.shingmark'
-
 
 def Dorequest(data):
     token = GetToken()
     headers = {"Content-type": "application/json",
                "Authorization": "Bearer " + token}
     con_data = DataConverter(data)
-    print("To HIS:", con_data)
+    logging.info("header is:"+headers)
+    logging.info("Data is:"+con_data)
+    #print("To HIS:", con_data)
     response2 = requests.post(
         "http://"+link+":9090/api/v1/", headers=headers, json=con_data)
     return response2
