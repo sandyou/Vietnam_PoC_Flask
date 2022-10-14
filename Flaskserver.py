@@ -3,7 +3,7 @@ import logging
 
 import Make_header
 import iMWard
-import tokenrequests
+import iMVS
 
 from flask import Flask, request, jsonify, redirect, url_for
 from flask_apscheduler import APScheduler
@@ -24,7 +24,6 @@ scheduler.init_app(app)
 def DoRequestfromHIStoiMward():
     iMWard.Doloop_UpdatetoiMWard()
 
-
 # set Flask service router
 
 
@@ -33,7 +32,7 @@ def getimvs():
     content = request.get_json(force=True)
     logging.info("iMVS data is:"+json.dumps(content))
     print("["+Make_header.Now_time()+" INFO ]Access iMVSdata, Do request to HIS")
-    res = tokenrequests.UpdateHIS_request(content)
+    res = iMVS.UpdateHIS_request(content)
     print("["+Make_header.Now_time()+" INFO ]request from HIS : "+res.text)
     return res.text
 
