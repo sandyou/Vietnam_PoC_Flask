@@ -1,2 +1,4 @@
 *.json
 /flaskserver
+*.txt
+*.log
