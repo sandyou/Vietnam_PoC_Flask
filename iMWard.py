@@ -8,6 +8,7 @@ from datetime import datetime
 from wsgiref import headers
 from progress.bar import Bar
 
+
 # Config link Path
 iMward_link = '192.168.201.207'
 
@@ -45,9 +46,10 @@ def UpdateiMward_request(data):
         # response2 = requests.post(
         #     "http://" + iMward_link + ":5000/InsertBedInfo", headers=header, json=data)
         response2 = requests.post(
-            "http://"+iMward_link+":5000/UpdateBedInfo", headers=header, json=data)
+            "http://"+iMward_link+":5000/UpdateBedInfo", headers=header, json=data, timeout=1)
     except Exception as error:
-        logging.error(str(error))
+        logging.error(error)
+        print("have error when update to imward")
         return 'Request Error'
     return str(response2.status_code)
 

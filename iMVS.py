@@ -9,7 +9,13 @@ def UpdateHIS_request(data):
     con_data = iMVStoHIS_DataConverter(data)
     logging.info("UpdateHIS_request header is:"+json.dumps(headers))
     logging.info("UpdateHIS_request Data is:"+json.dumps(con_data))
-    response2 = Make_header.Do_requesttoHIS(headers, con_data)
+    try:
+        response2 = Make_header.Do_requesttoHIS(headers, con_data)
+    except Exception as error:
+        logging.error(error)
+        print("have error when update iMVS data to HIS")
+    logging.info("patientNo "+con_data['value']['patientNo'] +
+                 " data update to HIS is success!!")
     return response2
 
 
