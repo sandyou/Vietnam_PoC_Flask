@@ -1,11 +1,18 @@
 import json
-from datetime import datetime
 import requests
 import logging
+import configparser
+from datetime import datetime
 
 # Config link Path
-# His_link = 'Noibo.shingmark'
-His_link = '115.75.7.105'
+try:
+    appconfig = configparser.ConfigParser()
+    appconfig.read('config.ini')
+    His_link = appconfig.get('link', 'His_link')
+except Exception as error:
+    logging.error(error)
+    print("Config error when catch HIS link, please check configfile!!")
+    quit()
 
 # setting logging config
 logging.basicConfig(level=logging.DEBUG, filename='request.log', filemode='w',

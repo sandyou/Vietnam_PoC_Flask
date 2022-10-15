@@ -12,14 +12,13 @@ from flask_apscheduler import APScheduler
 '''
     advance:
     check is new bednum
-    read index file to open which function need open
+    read config file to open which function need open
 '''
 
 # check config
 appconfig = configparser.ConfigParser()
 try:
     appconfig.read('config.ini')
-    appconfig.has_section('health device')
     appconfig.get('health device', 'iMVS')
     appconfig.get('health device', 'iMWard')
 except Exception as error:

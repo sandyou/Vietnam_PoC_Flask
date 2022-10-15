@@ -1,6 +1,7 @@
 import logging
 import json
 import requests
+import configparser
 
 import Make_header
 
@@ -10,7 +11,14 @@ from progress.bar import Bar
 
 
 # Config link Path
-iMward_link = '192.168.201.207'
+try:
+    appconfig = configparser.ConfigParser()
+    appconfig.read('config.ini')
+    iMward_link = appconfig.get('link', 'iMward_link')
+except Exception as error:
+    logging.error(error)
+    print("Config error when catch iMward link, please check configfile!!")
+    quit()
 
 
 def Doloop_UpdatetoiMWard():
