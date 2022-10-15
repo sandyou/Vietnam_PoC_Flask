@@ -2,3 +2,4 @@
 /flaskserver
 *.txt
 *.log
+!**requirement.txt
