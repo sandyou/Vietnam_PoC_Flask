@@ -15,9 +15,10 @@ try:
     appconfig = configparser.ConfigParser()
     appconfig.read('config.ini')
     iMward_link = appconfig.get('link', 'iMward_link')
+    iMward_mode = appconfig.get('health device', 'iMwardisInsert')
 except Exception as error:
     logging.error(error)
-    print("Config error when catch iMward link, please check configfile!!")
+    print("Config error when catch iMward link and mode, please check configfile!!")
     quit()
 
 
@@ -51,10 +52,14 @@ def UpdateiMward_request(data):
     logging.info("UpdateiMward_request Data is:" +
                  json.dumps(data['datalist'][0]['bedNum']))
     try:
-        # response2 = requests.post(
-        #     "http://" + iMward_link + ":5000/InsertBedInfo", headers=header, json=data)
-        response2 = requests.post(
-            "http://"+iMward_link+":5000/UpdateBedInfo", headers=header, json=data, timeout=1)
+        if iMward_mode == 'True':
+            print('insert')
+            response2 = requests.post(
+                "http://" + iMward_link + ":5000/InsertBedInfo", headers=header, json=data)
+        else:
+            print('update')
+            response2 = requests.post(
+                "http://"+iMward_link+":5000/UpdateBedInfo", headers=header, json=data, timeout=1)
     except Exception as error:
         logging.error(error)
         print("have error when update to imward")
