@@ -55,11 +55,11 @@ def UpdateiMward_request(data):
         if iMward_mode == 'True':
             print('insert')
             response2 = requests.post(
-                "http://" + iMward_link + ":5000/InsertBedInfo", headers=header, json=data)
+                "http://" + iMward_link + ":5000/InsertBedInfo", headers=header, json=data, timeout=2)
         else:
             print('update')
             response2 = requests.post(
-                "http://"+iMward_link+":5000/UpdateBedInfo", headers=header, json=data, timeout=1)
+                "http://"+iMward_link+":5000/UpdateBedInfo", headers=header, json=data, timeout=2)
     except Exception as error:
         logging.error(error)
         print("have error when update to imward")

@@ -12,7 +12,6 @@ from flask_apscheduler import APScheduler
 '''
     advance:
     check is new bednum
-    read config file to open which function need open
 '''
 
 # check config
@@ -36,7 +35,7 @@ scheduler.api_enabled = True
 # set scheduler
 
 if appconfig.get('health device', 'iMWard') == "True":
-    @scheduler.task('interval', id='do_job_1', seconds=10)
+    @scheduler.task('interval', id='do_job_1', seconds=60)
     def DoRequestfromHIStoiMward():
         iMWard.Doloop_UpdatetoiMWard()
 

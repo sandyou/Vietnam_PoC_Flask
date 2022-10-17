@@ -20,9 +20,16 @@ def UpdateHIS_request(data):
 
 
 def iMVStoHIS_DataConverter(Originaldata):
+    # execute PatientNo
+    if len(Originaldata['patientNo']) == 9:
+        patientno = Originaldata['patientNo'][0:2] + \
+            '.'+Originaldata['patientNo'][2:]
+    else:
+        patientno = Originaldata['patientNo']
+
     newdata = {'module': 'life_function',
                'value': {
-                   'patientNo': Originaldata['patientNo'],
+                   'patientNo': patientno,
                    'deviceNo': Originaldata['deviceNo'],
                    'measureDate': Originaldata['measureDateTime'],
                    'measureItems': Originaldata['measureItems']
