@@ -1,6 +1,7 @@
 import json
 import logging
 import configparser
+import sys
 
 import Make_header
 import iMWard
@@ -20,10 +21,11 @@ try:
     appconfig.read('config.ini')
     appconfig.get('health device', 'iMVS')
     appconfig.get('health device', 'iMWard')
+    UpadateTime = appconfig.get('health device', 'iMWard_updatetime')
 except Exception as error:
     logging.error(error)
     print("Config error please check configfile!!")
-    quit()
+    sys.exit()
 
     # define app
 app = Flask(__name__)
@@ -35,7 +37,7 @@ scheduler.api_enabled = True
 # set scheduler
 
 if appconfig.get('health device', 'iMWard') == "True":
-    @scheduler.task('interval', id='do_job_1', seconds=60)
+    @scheduler.task('interval', id='do_job_1', seconds=int(UpadateTime))
     def DoRequestfromHIStoiMward():
         iMWard.Doloop_UpdatetoiMWard()
 
@@ -45,10 +47,9 @@ if appconfig.get('health device', 'iMWard') == "True":
 @ app.route("/", methods=['POST'])
 def getimvs():
     content = request.get_json(force=True)
-    logging.info("iMVS data is:"+json.dumps(content))
-    print("["+Make_header.Now_time()+" INFO ]Access iMVSdata, Do request to HIS")
+    print("["+Make_header.Now_time()+" IMVS ]Access iMVSdata, Do request to HIS")
     res = iMVS.UpdateHIS_request(content)
-    print("["+Make_header.Now_time()+" INFO ]request from HIS : "+res.text)
+    print("["+Make_header.Now_time()+" IMVS ]request from HIS : "+res.text)
     return res.text
 
 

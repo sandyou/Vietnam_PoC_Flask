@@ -1,10 +1,15 @@
-import json
+import sys
 import requests
 import logging
 import configparser
 from datetime import datetime
 
 # Config link Path
+# setting logging config
+logging.basicConfig(level=logging.DEBUG, filename='request.log', filemode='w',
+                    format='[%(asctime)s %(levelname)-8s] %(message)s',
+                    datefmt='%Y%m%d %H:%M:%S')
+
 try:
     appconfig = configparser.ConfigParser()
     appconfig.read('config.ini')
@@ -12,16 +17,24 @@ try:
 except Exception as error:
     logging.error(error)
     print("Config error when catch HIS link, please check configfile!!")
-    quit()
+    sys.exit()
 
-# setting logging config
-logging.basicConfig(level=logging.DEBUG, filename='request.log', filemode='w',
-                    format='[%(asctime)s %(levelname)-8s] %(message)s',
-                    datefmt='%Y%m%d %H:%M:%S')
+
+def setup_logger(name, log_file, level=logging.DEBUG):
+    """To setup as many loggers as you want"""
+    handler = logging.FileHandler(log_file)
+    handler.setFormatter(logging.Formatter(
+        "[%(asctime)s %(levelname)-s] %(message)s",
+        "%Y-%m-%d %H:%M:%S"))
+    handler.setFormatter
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    logger.addHandler(handler)
+    return logger
 
 
 def Now_time():
-    return str(datetime.now().strftime("%Y/%m/%d %H:%M:%S.%f"))
+    return str(datetime.now().strftime("%Y/%m/%d %H:%M:%S"))
 
 
 def CreateHeader(token):

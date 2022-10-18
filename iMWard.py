@@ -1,7 +1,9 @@
 import logging
 import json
+import re
 import requests
 import configparser
+import sys
 
 import Make_header
 
@@ -10,61 +12,70 @@ from wsgiref import headers
 from progress.bar import Bar
 
 
+imward_log = Make_header.setup_logger('imward', 'imward_request.log')
 # Config link Path
 try:
     appconfig = configparser.ConfigParser()
     appconfig.read('config.ini')
     iMward_link = appconfig.get('link', 'iMward_link')
-    iMward_mode = appconfig.get('health device', 'iMwardisInsert')
 except Exception as error:
-    logging.error(error)
+    imward_log.error(error)
     print("Config error when catch iMward link and mode, please check configfile!!")
-    quit()
+    sys.exit()
 
 
 def Doloop_UpdatetoiMWard():
-    print("["+Make_header.Now_time()+" INFO ]Start update HIS to iMWard:")
+    print("["+Make_header.Now_time()+" IMWARD ]Start update HIS to iMWard:")
     header = Make_header.CreateHeader(Make_header.GetToken())
+
     # Do request to getting area's bed_info from HIS
-    print("["+Make_header.Now_time()+" INFO ]Geting data from HIS")
+    print("["+Make_header.Now_time()+" IMWARD ]Geting data from HIS")
     response_from_his = GetdatafromHIS_request(header)
+
     # Do request to update bed_info to iMward
-    print("["+Make_header.Now_time()+" INFO ]Do update to iMWard")
+    print("["+Make_header.Now_time()+" IMWARD ]Do update to iMWard")
     bar = Bar('Processing', max=len(response_from_his['data']))
+
     # Do Data Converter and request update to iMward
     for i in response_from_his['data']:
         body = HIStoiMward_Dataconverter(i)
-        respons = UpdateiMward_request(body)
-        if respons != str(200):
-            print("["+Make_header.Now_time() +
-                  " ERROR ]Update to iWard occured Error")
-        logging.info("Bed number:"+i['bedNum'] +
-                     " Update response is : "+respons)
+        respons = UpdateiMward_request(True, body)
+        if respons != 'Connection Error' and respons != 'Request Error' and len(respons.json()["error_bed"]) == 1:
+            respons = UpdateiMward_request(False, body)
+        if respons != 'Connection Error' and respons != 'Request Error' and len(respons.json()["error_bed"]) == 1:
+            print("["+Make_header.Now_time()+" IMWARD ]Somthing Error!!")
+        else:
+            imward_log.info(
+                "Finish " + body['datalist'][0]['bedNum']+" update!!")
         bar.next()
-        print("\n")
     bar.finish()
-    print("["+Make_header.Now_time()+" INFO ]Finish Bed iMWard info Update")
+    print("["+Make_header.Now_time()+" IMWARD ]Finish Bed iMWard info Update")
 
 
-def UpdateiMward_request(data):
+def UpdateiMward_request(IsUpdate, data):
     # logging.info("UpdateiMward_request header is:"+header)
     header = {"Content-type": "application/json"}
-    logging.info("UpdateiMward_request Data is:" +
-                 json.dumps(data['datalist'][0]['bedNum']))
+    imward_log.info("UpdateiMward_request Data is:" +
+                    json.dumps(data['datalist'][0]['bedNum']))
+    # imward_log.info(data)
     try:
-        if iMward_mode == 'True':
-            print('insert')
+        if IsUpdate == False:
             response2 = requests.post(
                 "http://" + iMward_link + ":5000/InsertBedInfo", headers=header, json=data, timeout=2)
         else:
-            print('update')
             response2 = requests.post(
                 "http://"+iMward_link+":5000/UpdateBedInfo", headers=header, json=data, timeout=2)
+    except requests.exceptions.ConnectionError as e:
+        imward_log.error(e)
+        print("["+Make_header.Now_time() +
+              " IMWARD ]has error when connection to : "+iMward_link)
+        return 'Connection Error'
     except Exception as error:
-        logging.error(error)
-        print("have error when update to imward")
+        imward_log.error(error)
+        print("["+Make_header.Now_time()+" IMWARD ]have error when update to imward, header is:" +
+              header + ", Content is : "+data+'\n')
         return 'Request Error'
-    return str(response2.status_code)
+    return response2
 
 
 def GetdatafromHIS_request(header):
@@ -100,7 +111,7 @@ def HIStoiMward_Dataconverter(Originaldata):
                       "outDepartDate":DateConverter(Originaldata['outDepartDate']),
                       "nursingLevel":Originaldata['nursingLevel'],
                       "area":Originaldata['area'],
-                      "operationDate":Originaldata['operationDate'],
+                      "operationDate":DateConverter(Originaldata['operationDate']),
                       "property1":Originaldata['property1'],
                       "property2":Originaldata['property2'],
                       "property3":Originaldata['property3'],
