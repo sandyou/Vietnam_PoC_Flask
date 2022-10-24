@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Config link Path
 # setting logging config
-logging.basicConfig(level=logging.DEBUG, filename='request.log', filemode='w',
+logging.basicConfig(level=logging.DEBUG, filename='request.log', filemode='a',
                     format='[%(asctime)s %(levelname)-8s] %(message)s',
                     datefmt='%Y%m%d %H:%M:%S')
 

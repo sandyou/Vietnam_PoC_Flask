@@ -3,17 +3,14 @@ import logging
 import configparser
 import sys
 
+from urllib3 import make_headers
+
 import Make_header
 import iMWard
 import iMVS
 
 from flask import Flask, request, jsonify, redirect, url_for
 from flask_apscheduler import APScheduler
-
-'''
-    advance:
-    check is new bednum
-'''
 
 # check config
 appconfig = configparser.ConfigParser()
@@ -49,8 +46,8 @@ def getimvs():
     content = request.get_json(force=True)
     print("["+Make_header.Now_time()+" IMVS ]Access iMVSdata, Do request to HIS")
     res = iMVS.UpdateHIS_request(content)
-    print("["+Make_header.Now_time()+" IMVS ]request from HIS : "+res.text)
-    return res.text
+    print("["+Make_header.Now_time()+" IMVS ]request from HIS : "+res)
+    return res
 
 
 if __name__ == "__main__":
