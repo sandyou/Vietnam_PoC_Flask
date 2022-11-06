@@ -34,7 +34,7 @@ def Doloop_UpdatetoiMWard():
 
     # Do request to update bed_info to iMward
     print("["+Make_header.Now_time()+" IMWARD ]Do update to iMWard")
-    bar = Bar('Processing', max=len(response_from_his['data']))
+    # bar = Bar('Processing', max=len(response_from_his['data']))
 
     # Do Data Converter and request update to iMward
     for i in response_from_his['data']:
@@ -47,8 +47,8 @@ def Doloop_UpdatetoiMWard():
         else:
             imward_log.info(
                 "Finish " + body['datalist'][0]['bedNum']+" update!!")
-        bar.next()
-    bar.finish()
+        # bar.next()
+    # bar.finish()
     print("["+Make_header.Now_time()+" IMWARD ]Finish Bed iMWard info Update")
 
 
@@ -73,7 +73,7 @@ def UpdateiMward_request(IsUpdate, data):
     except Exception as error:
         imward_log.error(error)
         print("["+Make_header.Now_time()+" IMWARD ]have error when update to imward, header is:" +
-              header + ", Content is : "+data+'\n')
+              str(header) + ", Content is : "+str(data)+'\n')
         return 'Request Error'
     return response2
 
@@ -95,12 +95,29 @@ def DateConverter(Originaltime):
 
 
 def HIStoiMward_Dataconverter(Originaldata):
+    dic = {
+        "115-01": "115",
+        "114-01": "114-1",
+        "114-02": "114-2",
+        "113-01": "113-1",
+        "113-02": "113-2",
+        "112-01": "112",
+        "111-01": "111",
+        "110-01": "110-1",
+        "110-02": "110-2"
+    }
+
+    if str(Originaldata['bedNum']) in dic:
+        bednum = dic[str(Originaldata['bedNum'])]
+    else:
+        bednum = Originaldata['bedNum']
+
     newData = {
         "datalist": [{"patientName": Originaldata['patientName'],
                       "age":Originaldata['age'],
                       "birthDate":DateConverter(Originaldata['birthDate']),
                       "gender":Originaldata['gender'],
-                      "bedNum":Originaldata['bedNum'],
+                      "bedNum":bednum,
                       "inPatientNum":Originaldata['inPatientNum'][0:20],
                       "mainDoc":Originaldata['mainDoc'][0:16],
                       "nurse":Originaldata['nurse'][0:16],
