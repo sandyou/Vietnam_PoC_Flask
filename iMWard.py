@@ -1,6 +1,4 @@
-import logging
 import json
-import re
 import requests
 import configparser
 import sys
@@ -8,7 +6,6 @@ import sys
 import Make_header
 
 from datetime import datetime
-from wsgiref import headers
 from progress.bar import Bar
 
 
@@ -28,13 +25,16 @@ def Doloop_UpdatetoiMWard():
     print("["+Make_header.Now_time()+" IMWARD ]Start update HIS to iMWard:")
     header = Make_header.CreateHeader(Make_header.GetToken())
 
+    print("["+Make_header.Now_time()+" IMWARD ]Refresh iMWard data.")
+    HIStoiMward_DataRefresh()
+
     # Do request to getting area's bed_info from HIS
     print("["+Make_header.Now_time()+" IMWARD ]Geting data from HIS")
     response_from_his = GetdatafromHIS_request(header)
 
     # Do request to update bed_info to iMward
     print("["+Make_header.Now_time()+" IMWARD ]Do update to iMWard")
-    # bar = Bar('Processing', max=len(response_from_his['data']))
+    bar = Bar('Processing', max=len(response_from_his['data']))
 
     # Do Data Converter and request update to iMward
     for i in response_from_his['data']:
@@ -47,8 +47,8 @@ def Doloop_UpdatetoiMWard():
         else:
             imward_log.info(
                 "Finish " + body['datalist'][0]['bedNum']+" update!!")
-        # bar.next()
-    # bar.finish()
+        bar.next()
+    bar.finish()
     print("["+Make_header.Now_time()+" IMWARD ]Finish Bed iMWard info Update")
 
 
@@ -144,3 +144,52 @@ def HIStoiMward_Dataconverter(Originaldata):
     }
 
     return newData
+
+
+def HIStoiMward_DataRefresh():
+    header = {"Content-type": "application/json"}
+    dataa = {"tenant_name": "t1"}
+    try:
+        Getbednum = requests.post("http://" + iMward_link +
+                                  ":5000/QueryBedInfo", headers=header, json=dataa, timeout=2)
+    except error as e:
+        imward_log.error(e)
+
+    refresh = {
+        "datalist": [],
+        "tenant_name": "t1"
+    }
+    for t in Getbednum.json()['data']:
+        refresh['datalist'].append({"patientName": "none",
+                                    "age": "",
+                                    "birthDate": "",
+                                    "gender": "",
+                                    "bedNum": t['bedNum'],
+                                    "inPatientNum": "",
+                                    "mainDoc": "",
+                                    "nurse": "",
+                                    "nurse2": "",
+                                    "inDoc": "",
+                                    "precaution": "",
+                                    "inDepartDate": "",
+                                    "outDepartDate": "",
+                                    "nursingLevel": "",
+                                    "area": "",
+                                    "operationDate": "",
+                                    "property1": "",
+                                    "property2": "",
+                                    "property3": "",
+                                    "property4": "",
+                                    "property5": "",
+                                    "diastolicBloodPressure": "",
+                                    "systolicBloodPressure": "",
+                                    "bodyTemperature": "",
+                                    "height": "",
+                                    "weight": ""
+                                    })
+    try:
+        response = requests.post("http://" + iMward_link +
+                                 ":5000/UpdateBedInfo", headers=header, json=refresh, timeout=2)
+        imward_log.info('Clear iMWard respones is : '+response.text)
+    except error as e:
+        imward_log.error(e)

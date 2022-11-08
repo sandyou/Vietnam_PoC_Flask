@@ -3,12 +3,11 @@ import requests
 import logging
 import configparser
 from datetime import datetime
+from logging.handlers import TimedRotatingFileHandler
 
-# Config link Path
-# setting logging config
-logging.basicConfig(level=logging.DEBUG, filename='request.log', filemode='a',
-                    format='[%(asctime)s %(levelname)-8s] %(message)s',
-                    datefmt='%Y%m%d %H:%M:%S')
+# logging.basicConfig(level=logging.DEBUG, filename='request.log', filemode='a',
+#                     format='[%(asctime)s %(levelname)-8s] %(message)s',
+#                     datefmt='%Y%m%d %H:%M:%S')
 
 try:
     appconfig = configparser.ConfigParser()
@@ -20,16 +19,25 @@ except Exception as error:
     sys.exit()
 
 
+logging.basicConfig(
+    handlers=[
+        TimedRotatingFileHandler('uvicorn_server.log',
+                                 when='d', interval=3, backupCount=5)],
+    level=logging.DEBUG,
+    format='[%(asctime)s %(levelname)-8s] %(message)s',
+    datefmt='%Y%m%d %H:%M:%S')
+
+
 def setup_logger(name, log_file, level=logging.DEBUG):
     """To setup as many loggers as you want"""
-    handler = logging.FileHandler(log_file)
-    handler.setFormatter(logging.Formatter(
+    handle = TimedRotatingFileHandler(
+        log_file, when='d', interval=3, backupCount=5)
+    handle.setFormatter(logging.Formatter(
         "[%(asctime)s %(levelname)-s] %(message)s",
         "%Y-%m-%d %H:%M:%S"))
-    handler.setFormatter
     logger = logging.getLogger(name)
     logger.setLevel(level)
-    logger.addHandler(handler)
+    logger.addHandler(handle)
     return logger
 
 
