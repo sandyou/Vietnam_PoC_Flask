@@ -119,10 +119,10 @@ def HIStoiMward_Dataconverter(Originaldata):
                       "gender":Originaldata['gender'],
                       "bedNum":bednum,
                       "inPatientNum":Originaldata['inPatientNum'][0:20],
-                      "mainDoc":Originaldata['mainDoc'][0:16],
-                      "nurse":Originaldata['nurse'][0:16],
+                      "mainDoc":Originaldata['mainDoc'][0:32],
+                      "nurse":Originaldata['nurse'][0:32],
                       "nurse2":Originaldata['nurse2'],
-                      "inDoc":Originaldata['inDoc'][0:16],
+                      "inDoc":Originaldata['inDoc'][0:32],
                       "precaution":Originaldata['precaution'],
                       "inDepartDate":DateConverter(Originaldata['inDepartDate']),
                       "outDepartDate":DateConverter(Originaldata['outDepartDate']),
@@ -152,7 +152,7 @@ def HIStoiMward_DataRefresh():
     try:
         Getbednum = requests.post("http://" + iMward_link +
                                   ":5000/QueryBedInfo", headers=header, json=dataa, timeout=2)
-    except error as e:
+    except Exception as e:
         imward_log.error(e)
 
     refresh = {
@@ -191,5 +191,5 @@ def HIStoiMward_DataRefresh():
         response = requests.post("http://" + iMward_link +
                                  ":5000/UpdateBedInfo", headers=header, json=refresh, timeout=2)
         imward_log.info('Clear iMWard respones is : '+response.text)
-    except error as e:
+    except Exception as e:
         imward_log.error(e)
