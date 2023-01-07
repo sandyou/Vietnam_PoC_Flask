@@ -112,6 +112,9 @@ def HIStoiMward_Dataconverter(Originaldata):
     else:
         bednum = Originaldata['bedNum']
 
+    diastolicBloodPressure = str(
+        Originaldata['diastolicBloodPressure'])+"/"+str(Originaldata['systolicBloodPressure'])
+
     newData = {
         "datalist": [{"patientName": Originaldata['patientName'],
                       "age":Originaldata['age'],
@@ -134,7 +137,7 @@ def HIStoiMward_Dataconverter(Originaldata):
                       "property3":Originaldata['property3'],
                       "property4":Originaldata['property4'],
                       "property5":Originaldata['property5'],
-                      "diastolicBloodPressure":Originaldata['diastolicBloodPressure'],
+                      "diastolicBloodPressure":diastolicBloodPressure,
                       "systolicBloodPressure":Originaldata['systolicBloodPressure'],
                       "bodyTemperature":Originaldata['bodyTemperature'],
                       "height":Originaldata['height'],
